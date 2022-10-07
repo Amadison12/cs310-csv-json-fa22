@@ -62,15 +62,28 @@ public class Converter {
         
         String results = "";
         
-        try {
+        try(InputStream in = new FileInputStream(csvFile);)  {
             
             // Initialize CSV Reader and Iterator
             
             CSVReader reader = new CSVReader(new StringReader(csvString));
             List<String[]> full = reader.readAll();
             Iterator<String[]> iterator = full.iterator();
-            
-            /* INSERT YOUR CODE HERE */
+                   
+            if (csv.hasNext()) fieldNames = new ArrayList < > (csv.next());
+            List < Map < String, String >> list = new ArrayList < > ();
+                while (csv.hasNext()) {
+            List < String > x = csv.next();
+                    Map < String, String > obj = new LinkedHashMap < > ();
+                    for (int i = 0; i < fieldNames.size(); i++) {
+                        obj.put(fieldNames.get(i), x.get(i));
+                    }
+                    list.add(obj);
+                }
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
+                mapper.writeValue(System.out, list);
+
             
         }
         catch(Exception e) { e.printStackTrace(); }
@@ -85,15 +98,27 @@ public class Converter {
         
         String results = "";
         
+         
+        JSONObject output;
+        
         try {
-            
+            output = new JSONObject(jsonString);
+
             // Initialize JSON Parser and CSV Writer
             
             JSONParser parser = new JSONParser();
             StringWriter writer = new StringWriter();
             CSVWriter csvWriter = new CSVWriter(writer, ',', '"', '\\', "\n");
             
-            /* INSERT YOUR CODE HERE */
+            JSONArray docs = output.getJSONArray("infile");
+
+            File file=new File("/tmp2/fromJSON.csv");
+            String csv = CDL.toString(docs);
+            FileUtils.writeStringToFile(file, csv);
+            
+        } catch (JSONException e) {
+            e.printStackTrace();
+            
             
         }
         catch(Exception e) { e.printStackTrace(); }
